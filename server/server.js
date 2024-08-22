@@ -2,7 +2,23 @@ const express = require("express");
 const rateLimit = require("express-rate-limit");
 const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
+const path = require("path");
+const cors = require("cors");
 const app = express();
+app.use(
+  cors({
+    origin: "*", // allow only your frontend origin
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+const clientBuildPath = path.join(__dirname, "../client/build");
+console.log("cliuent path", clientBuildPath);
+
+app.use(express.static(clientBuildPath));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientBuildPath, "index.html"));
+});
 app.use(express.json());
 app.use(helmet());
 app.use(mongoSanitize());
